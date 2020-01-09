@@ -38,8 +38,6 @@
 #include "DemoDatalog.h"
 #include "DemoSerial.h"
 #include "MotionAW_Manager.h"
-#include "MotionFD_Manager.h"
-#include "MotionSD_Manager.h"
 #include "MotionSM_Manager.h"
 
 
@@ -92,8 +90,6 @@ static void MX_GPIO_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM_ALGO_Init(void);
 static void AW_Data_Handler(TMsg *Msg);
-static void FD_Data_Handler(TMsg *Msg);
-static void SD_Data_Handler(TMsg *Msg);
 static void SM_Data_Handler(TMsg *Msg);
 static void Accelero_Sensor_Handler(TMsg *Msg, uint32_t Instance);
 static void Gyro_Sensor_Handler(TMsg *Msg, uint32_t Instance);
@@ -149,8 +145,6 @@ int main(void)
 
   /* Activity Recognition API initialization function */
   MotionAW_manager_init();
-  MotionFD_manager_init();
-  MotionSD_manager_init();
   MotionSM_manager_init();
 
   /* OPTIONAL */
@@ -185,10 +179,6 @@ int main(void)
 		  case AW_MODE:	
 			AW_Data_Handler(&msg_dat);
 			break;
-
-		   case SD_MODE:
-		   	SD_Data_Handler(&msg_dat);
-		   	break;
 
 		   case SM_MODE:
 		    SM_Data_Handler(&msg_dat);
@@ -300,8 +290,6 @@ static void AW_Data_Handler(TMsg *Msg)
   MAW_input_t data_aw_in = {.AccX = 0.0f, .AccY = 0.0f, .AccZ = 0.0f};
   static MAW_activity_t activity;
 
-  MFD_input_t data_fd_in = {.AccX = 0.0f, .AccY = 0.0f, .AccZ = 0.0f, .Press = 0.0f};
-  static MFD_output_t data_fd_out;
 
   if ((SensorsEnabled & ACCELEROMETER_SENSOR) == ACCELEROMETER_SENSOR
   	  &&(SensorsEnabled & PRESSURE_SENSOR) == PRESSURE_SENSOR)
@@ -311,17 +299,10 @@ static void AW_Data_Handler(TMsg *Msg)
 	data_aw_in.AccY = (float)AccValue.y / 1000.0f;
 	data_aw_in.AccZ = (float)AccValue.z / 1000.0f;
 
-	/* Add acceleration [mg] */
-    data_fd_in.AccX = (float)AccValue.x;
-    data_fd_in.AccY = (float)AccValue.y;
-    data_fd_in.AccZ = (float)AccValue.z;
-    data_fd_in.Press = PresValue;
 
 	/* Run Activity Recognition algorithm */
 	BSP_LED_On(LED2);
 	MotionAW_manager_run(&data_aw_in, &activity, TimeStamp);
-	MotionFD_manager_update(&data_fd_in, &data_fd_out);
-	
 	BSP_LED_Off(LED2);
 
 	uint8_t sendMSG[20];
@@ -377,71 +358,7 @@ static void AW_Data_Handler(TMsg *Msg)
 			  HAL_UART_Transmit(&UartHandle, (uint8_t *)sendMSG, strlen(sendMSG), 0xFF);
 			  break;
 		}
-
-	switch(data_fd_out){
-		case MFD_NOFALL:
-			break;
-		case  MFD_FALL:
-			for(int i=0;i<10;i++){
-				strcpy(sendMSG,"p");
-				HAL_UART_Transmit(&UartHandle, (uint8_t *)sendMSG, strlen(sendMSG), 0xFF);
-			}
-			break;
-		default:
-			strcpy(sendMSG,"j");
-			HAL_UART_Transmit(&UartHandle, (uint8_t *)sendMSG, strlen(sendMSG), 0xFF);
-			break;	
-	}	
   }
-}
-/**
- * @brief  Standing vs Sitting Desk Detection data handler
- * @param  Msg the Position data part of the stream
- * @retval None
- */
-static void SD_Data_Handler(TMsg *Msg)
-{
-  MSD_input_t data_in = {.AccX = 0.0f, .AccY = 0.0f, .AccZ = 0.0f, .Press = 0.0f};
-  static MSD_output_t data_out;
-
-  if ((SensorsEnabled & ACCELEROMETER_SENSOR) == ACCELEROMETER_SENSOR
-  		&&(SensorsEnabled & PRESSURE_SENSOR) == PRESSURE_SENSOR)
-  {
-    /* Convert acceleration from [mg] to [g] */
-    data_in.AccX = (float)AccValue.x / 1000.0f;
-    data_in.AccY = (float)AccValue.y / 1000.0f;
-    data_in.AccZ = (float)AccValue.z / 1000.0f;
-    data_in.Press = PresValue;
-
-    /* Run Standing vs Sitting Desk Detetcion algorithm */
-    BSP_LED_On(LED2);
-    MotionSD_manager_run(&data_in, &data_out);
-    BSP_LED_Off(LED2);
-    uint8_t sendMSG[20];
-
-	switch(data_out){
-			case MSD_UNKNOWN_DESK:
-			  strcpy(sendMSG,"k");
-			  HAL_UART_Transmit(&UartHandle, (uint8_t *)sendMSG, strlen(sendMSG), 0xFF);
-			  break;
-
-			case MSD_SITTING_DESK:
-			  strcpy(sendMSG,"l");
-			  HAL_UART_Transmit(&UartHandle, (uint8_t *)sendMSG, strlen(sendMSG), 0xFF);
-			  break;
-
-			case MSD_STANDING_DESK:
-			  strcpy(sendMSG,"m");
-			  HAL_UART_Transmit(&UartHandle, (uint8_t *)sendMSG, strlen(sendMSG), 0xFF);
-			  break;
-
-			default:
-			  strcpy(sendMSG,"j");
-			  HAL_UART_Transmit(&UartHandle, (uint8_t *)sendMSG, strlen(sendMSG), 0xFF);
-			  break;
-	}
-  }
-
 }
 
 /**
@@ -516,9 +433,6 @@ static void Accelero_Sensor_Handler(TMsg *Msg, uint32_t Instance)
 	(void)IKS01A2_MOTION_SENSOR_GetAxes(Instance, MOTION_ACCELERO, &AccValue);
 	if(AccZ_prev*(float)AccValue.z<0)
 		TurnOver=1;
-	//Serialize_s32(&Msg->Data[19], (int32_t)AccValue.x, 4);
-	//Serialize_s32(&Msg->Data[23], (int32_t)AccValue.y, 4);
-	//Serialize_s32(&Msg->Data[27], (int32_t)AccValue.z, 4);
   }
 }
 /**
@@ -532,9 +446,6 @@ static void Gyro_Sensor_Handler(TMsg *Msg, uint32_t Instance)
   if ((SensorsEnabled & GYROSCOPE_SENSOR) == GYROSCOPE_SENSOR)
   {
     (void)IKS01A2_MOTION_SENSOR_GetAxes(Instance, MOTION_GYRO, &GyrValue);
-    //Serialize_s32(&Msg->Data[31], GyrValue.x, 4);
-    //Serialize_s32(&Msg->Data[35], GyrValue.y, 4);
-    //Serialize_s32(&Msg->Data[39], GyrValue.z, 4);
   }
 }
 
@@ -551,9 +462,6 @@ static void Magneto_Sensor_Handler(TMsg *Msg, uint32_t Instance)
   if ((SensorsEnabled & MAGNETIC_SENSOR) == MAGNETIC_SENSOR)
   {
     (void)IKS01A2_MOTION_SENSOR_GetAxes(Instance, MOTION_MAGNETO, &mag_value);
-    //Serialize_s32(&Msg->Data[43], mag_value.x, 4);
-    //Serialize_s32(&Msg->Data[47], mag_value.y, 4);
-    //Serialize_s32(&Msg->Data[51], mag_value.z, 4);
   }
 }
 
@@ -568,7 +476,6 @@ static void Pressure_Sensor_Handler(TMsg *Msg, uint32_t Instance)
   if ((SensorsEnabled & PRESSURE_SENSOR) == PRESSURE_SENSOR)
   {
     (void)IKS01A2_ENV_SENSOR_GetValue(Instance, ENV_PRESSURE, &PresValue);
-    //(void)memcpy(&Msg->Data[7], (void *)&PresValue, sizeof(float));
   }
 }
 
@@ -585,7 +492,6 @@ static void Temperature_Sensor_Handler(TMsg *Msg, uint32_t Instance)
   if ((SensorsEnabled & TEMPERATURE_SENSOR) == TEMPERATURE_SENSOR)
   {
     (void)IKS01A2_ENV_SENSOR_GetValue(Instance, ENV_TEMPERATURE, &temp_value);
-    //(void)memcpy(&Msg->Data[11], (void *)&temp_value, sizeof(float));
   }
 }
 
@@ -602,7 +508,6 @@ static void Humidity_Sensor_Handler(TMsg *Msg, uint32_t Instance)
   if ((SensorsEnabled & HUMIDITY_SENSOR) == HUMIDITY_SENSOR)
   {
     (void)IKS01A2_ENV_SENSOR_GetValue(Instance, ENV_HUMIDITY, &hum_value);
-    //(void)memcpy(&Msg->Data[15], (void *)&hum_value, sizeof(float));;
   }
 }
 
@@ -778,7 +683,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIOPin)
   {
 	if (BSP_PB_GetState(BUTTON_KEY) == (uint32_t)GPIO_PIN_RESET)
 	{
-	  ProgramState = (ProgramState+1)%3;
+	  ProgramState = (ProgramState+1)%2;
 	}
   }
 }
