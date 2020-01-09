@@ -18,9 +18,6 @@
 
 using namespace std;
 
-//extern TTF_Font *gFont;
-//extern SDL_Renderer* gRenderer;
-
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -35,7 +32,7 @@ bool loadMedia();
 void close();
 
 //use for socket
-void socket_client();
+void socket_server();
 int recvtimeout(int s, char *buf, int len, int timeout);
 
 //check if mouse in rectangle
@@ -118,7 +115,7 @@ bool init()
         }
 
 		//Create window
-		gWindow = SDL_CreateWindow( "Smart Cusion", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+		gWindow = SDL_CreateWindow( "Recorder", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if( gWindow == NULL )
 		{
 			printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
@@ -169,150 +166,145 @@ bool loadMedia()
 	bool success = true;
 
 	//Load stretching surface
-	gSurface = loadSurface( "scene.bmp" );
+	gSurface = loadSurface( "pic/scene.bmp" );
 	if( gSurface == NULL )
 	{
-		printf( "Failed to load smart_cushion image!\n" );
+		printf( "Failed to load scene image!\n" );
 		success = false;
 	}
-	gbuttonSurface = loadSurface( "start_icon.bmp" );
+	gbuttonSurface = loadSurface( "pic/start_icon.bmp" );
 	if( gbuttonSurface == NULL )
 	{
 		printf( "Failed to load start_icon image!\n" );
 		success = false;
 	}
-	gTurnOverSurface = loadSurface( "turn_over.bmp" );
+	gTurnOverSurface = loadSurface( "pic/turn_over.bmp" );
 	if( gTurnOverSurface == NULL )
 	{
 		printf( "Failed to turn over image!\n" );
 		success = false;
 	}
-	gsleepSurface = loadSurface( "sleep.bmp" );
+	gsleepSurface = loadSurface( "pic/sleep.bmp" );
 	if( gsleepSurface == NULL )
 	{
 		printf( "Failed to load sleep image!\n" );
 		success = false;
 	}
-	gstationSurface = loadSurface( "station.bmp" );
+	gstationSurface = loadSurface( "pic/moving/station.bmp" );
 	if( gstationSurface == NULL )
 	{
 		printf( "Failed to load station image!\n" );
 		success = false;
 	}
-	grunningSurface = loadSurface( "run.bmp" );
+	grunningSurface = loadSurface( "pic/moving/run.bmp" );
 	if( grunningSurface == NULL )
 	{
 		printf( "Failed to load running image!\n" );
 		success = false;
 	}
-	gnoSurface = loadSurface( "no.bmp" );
+	gnoSurface = loadSurface( "pic/moving/no.bmp" );
 	if( gnoSurface == NULL )
 	{
-		printf( "Failed to load running image!\n" );
+		printf( "Failed to load no image!\n" );
 		success = false;
 	}
-	gsittingSurface = loadSurface( "sit.bmp" );
+	gsittingSurface = loadSurface( "pic/moving/sit.bmp" );
 	if( gsittingSurface == NULL )
 	{
-		printf( "Failed to load sitting_long image!\n" );
+		printf( "Failed to load sitting image!\n" );
 		success = false;
 	}
-	glyingSurface = loadSurface( "lying.bmp" );
+	glyingSurface = loadSurface( "pic/moving/lying.bmp" );
 	if( glyingSurface == NULL )
 	{
 		printf( "Failed to load lying image!\n" );
 		success = false;
 	}
-	gstandSurface = loadSurface( "stand.bmp" );
+	gstandSurface = loadSurface( "pic/moving/stand.bmp" );
 	if( gstandSurface == NULL )
 	{
 		printf( "Failed to load stand image!\n" );
 		success = false;
 	}
-	gwalkSurface = loadSurface( "walk.bmp" );
+	gwalkSurface = loadSurface( "pic/moving/walk.bmp" );
 	if( gwalkSurface == NULL )
 	{
 		printf( "Failed to load walk image!\n" );
 		success = false;
 	}
-	gbikingSurface = loadSurface( "biking.bmp" );
+	gbikingSurface = loadSurface( "pic/moving/biking.bmp" );
 	if( gbikingSurface == NULL )
 	{
 		printf( "Failed to load biking image!\n" );
 		success = false;
 	}
-	gbikingSurface2 = loadSurface( "no_sleep/biking.bmp" );
+	gjogSurface = loadSurface( "pic/moving/jogging.bmp" );
+	if( gjogSurface == NULL )
+	{
+		printf( "Failed to load jogging image!\n" );
+		success = false;
+	}
+	gbikingSurface2 = loadSurface( "pic/nosleep/biking.bmp" );
 	if( gbikingSurface2 == NULL )
 	{
 		printf( "Failed to load biking image!\n" );
 		success = false;
 	}
-	gstationSurface2 = loadSurface( "no_sleep/station.bmp" );
+	gstationSurface2 = loadSurface( "pic/nosleep/station.bmp" );
 	if( gstationSurface2 == NULL )
 	{
 		printf( "Failed to load station image!\n" );
 		success = false;
 	}
-	grunningSurface2 = loadSurface( "no_sleep/run.bmp" );
+	grunningSurface2 = loadSurface( "pic/nosleep/run.bmp" );
 	if( grunningSurface2 == NULL )
 	{
 		printf( "Failed to load running image!\n" );
 		success = false;
 	}
-	gnoSurface2 = loadSurface( "no_sleep/no.bmp" );
+	gnoSurface2 = loadSurface( "pic/nosleep/no.bmp" );
 	if( gnoSurface2 == NULL )
 	{
 		printf( "Failed to load running image!\n" );
 		success = false;
 	}
-	gsittingSurface2 = loadSurface( "no_sleep/sit.bmp" );
+	gsittingSurface2 = loadSurface( "pic/nosleep/sit.bmp" );
 	if( gsittingSurface2 == NULL )
 	{
 		printf( "Failed to load sitting_long image!\n" );
 		success = false;
 	}
-	glyingSurface2 = loadSurface( "no_sleep/lying.bmp" );
+	glyingSurface2 = loadSurface( "pic/nosleep/lying.bmp" );
 	if( glyingSurface2 == NULL )
 	{
 		printf( "Failed to load lying image!\n" );
 		success = false;
 	}
-	gstandSurface2 = loadSurface( "no_sleep/stand.bmp" );
+	gstandSurface2 = loadSurface( "pic/nosleep/stand.bmp" );
 	if( gstandSurface2 == NULL )
 	{
 		printf( "Failed to load stand image!\n" );
 		success = false;
 	}
-	gwalkSurface2 = loadSurface( "no_sleep/walk.bmp" );
+	gwalkSurface2 = loadSurface( "pic/nosleep/walk.bmp" );
 	if( gwalkSurface2 == NULL )
 	{
 		printf( "Failed to load walk image!\n" );
 		success = false;
 	}
-	gexitSurface = loadSurface( "exit.bmp" );
+	gjogSurface2 = loadSurface( "pic/nosleep/jogging.bmp" );
+	if( gjogSurface2 == NULL )
+	{
+		printf( "Failed to load jog image!\n" );
+		success = false;
+	}
+	gexitSurface = loadSurface( "pic/exit.bmp" );
 	if( gexitSurface == NULL )
 	{
 		printf( "Failed to load exit image!\n" );
 		success = false;
 	}
 
-	/*//open font
-	gFont = TTF_OpenFont( "lazy.ttf", 28 );
-	if( gFont == NULL )
-	{
-		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
-		success = false;
-	}
-	else
-	{
-		//Render text
-		SDL_Color textColor = { 0, 0, 0 };
-		if( !gTextTexture.loadFromRenderedText( "The quick brown fox jumps over the lazy dog", textColor ) )
-		{
-			printf( "Failed to render text texture!\n" );
-			success = false;
-		}
-	}*/
 	return success;
 }
 
@@ -385,9 +377,8 @@ int recvtimeout(int sockfd, char *buf, int len, int timeout)
 	return recv(sockfd, buf, len, 0);
 }
 
-void socket_client()
+void socket_server()
 {	
-	//
 	SDL_Rect stretchRect;
 	stretchRect.x = 0;
 	stretchRect.y = 0;
@@ -399,13 +390,13 @@ void socket_client()
 	exitRect.y = SCREEN_HEIGHT*3/4;
 	exitRect.w = SCREEN_WIDTH/6;
 	exitRect.h = SCREEN_HEIGHT/4;
-	SDL_BlitScaled( grunningSurface, NULL, gScreenSurface, &stretchRect );
+	SDL_BlitScaled( gSurface, NULL, gScreenSurface, &stretchRect );
 							
-
 	SDL_BlitScaled( gexitSurface, NULL, gScreenSurface, &exitRect );
 	//Update the surface
 	SDL_UpdateWindowSurface( gWindow );
 
+	//socket 
 	int listenfd = 0, connfd = 0;
 	struct sockaddr_in serv_addr;
 	char sendBuff[1024];
@@ -427,48 +418,10 @@ void socket_client()
 
 
 	bool exit = false;
-    //state: 0: healthy, 1:too right, 2:too left, 3:sit too long, 4: leave
     while(!exit)
     {
 		SDL_Event e_2;
 		bool mouse = false;
-	//	int sendState = send(fd,message,sizeof(message),MSG_DONTWAIT);
-
-		//cout << "sendState = " <<receiveMessage[0] <<endl;
-        //int recvState = recv(sockfd,state,1,0);
-		//int recvState = recvtimeout(sockfd, receiveMessage, sizeof(receiveMessage), 10);
-		//socket server is closed
-		/*if(recvState == 0)
-		{
-			cout<<"close Socket"<<endl;
-    		close(sockfd);
-			return;
-		}
-		//error
-		else if(recvState == -1)
-		{
-			cout<<"error";
-		}*/
-			/*
-		else if(receiveMessage == "fast walking")
-		{
-			SDL_BlitScaled( grunningSurface, NULL, gScreenSurface, &stretchRect );
-		}
-		else if(receiveMessage == "")
-		{
-			SDL_BlitScaled( grightSurface, NULL, gScreenSurface, &stretchRect );
-		}
-		else if(receiveMessage[0] == '2')
-		{
-			SDL_BlitScaled( gleftSurface, NULL, gScreenSurface, &stretchRect );
-		}
-		else if(receiveMessage[0] == '3') 
-		{
-			SDL_BlitScaled( gsittingSurface, NULL, gScreenSurface, &stretchRect );
-		}
-
-		SDL_BlitScaled( gexitSurface, NULL, gScreenSurface, &exitRect );
-        //recv(sockfd,receiveMessage,sizeof(receiveMessage),0);*/
 		string msg="";
 		bool IsTurnOver=false;
 		while (1) {
@@ -488,10 +441,8 @@ void socket_client()
 					
 					if(msg == "no activity")
 						SDL_BlitScaled( gnoSurface, NULL, gScreenSurface, &stretchRect );
-					else if(msg == "stationary") {
-						cout<<"mom Im here\n";
+					else if(msg == "stationary") 
 						SDL_BlitScaled( gstationSurface, NULL, gScreenSurface, &stretchRect );
-					}
 					else if(msg == "standing")
 						SDL_BlitScaled( gstandSurface, NULL, gScreenSurface, &stretchRect );
 					else if(msg == "sitting")
@@ -534,26 +485,11 @@ void socket_client()
 						SDL_BlitScaled( gjogSurface2, NULL, gScreenSurface, &stretchRect );
 					else if(msg == "no sleeping, biking")
 						SDL_BlitScaled( gbikingSurface2, NULL, gScreenSurface, &stretchRect );
-//					SDL_BlitScaled( gexitSurface, NULL, gScreenSurface, &exitRect );
 					SDL_UpdateWindowSurface( gWindow );
+					
 					if (IsTurnOver){
 						sleep(1);
 						IsTurnOver=false;
-					}
-					// write to screen
-					gFont = TTF_OpenFont( "lazy.ttf", 28 );
-					if( gFont == NULL )
-					{	
-						printf( "Failed to load font! SDL_ttf Error: %s\n", TTF_GetError() );
-					}
-					else
-					{
-						//Render text
-						SDL_Color textColor = { 0, 0, 0 };
-						if( !gTextTexture.loadFromRenderedText( recvBuff , textColor ) )
-						{
-							printf( "Failed to render text texture!\n" );
-						}
 					}
 
 					write(connfd, sendBuff, strlen(sendBuff));
@@ -562,17 +498,6 @@ void socket_client()
 		}
 		//Update the surface
 		SDL_UpdateWindowSurface( gWindow );
-		while(SDL_PollEvent( &e_2 ) != 0)
-		{	
-			if( e_2.type == SDL_MOUSEBUTTONDOWN )
-			{
-				mouse = true;
-			}
-			else if( e_2.type == SDL_MOUSEBUTTONUP && mouse )
-			{
-				exit = checkmousepos(exitRect);
-			}
-		}
     }
 
     //cout<<receiveMessage<<endl;
@@ -658,20 +583,9 @@ int main( int argc, char* args[] )
 					}
 					else if( e.type == SDL_MOUSEBUTTONUP && mouse )
 					{
-						if( !checkmousepos(buttonRect))//x>buttonRect.x && x<buttonRect.x+buttonRect.w && y>buttonRect.y && y<buttonRect.y+buttonRect.h )
+						if( !checkmousepos(buttonRect))
 						{
-							//Apply the image stretched
-							/*
-							SDL_Rect runningRect;
-							runningRect.x = 0;
-							runningRect.y = 0;
-							runningRect.w = SCREEN_WIDTH;
-							runningRect.h = SCREEN_HEIGHT;
-							SDL_BlitScaled( grunningSurface, NULL, gScreenSurface, &runningRect );
-							//Update the surface
-							SDL_UpdateWindowSurface( gWindow );
-							*/
-							socket_client();
+							socket_server();
 							reset_screen(buttonRect);
 						}
 						mouse = false;
