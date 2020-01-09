@@ -52,7 +52,7 @@ int main() {
         printf("Error! socket.open() returned: %d\n", result);
     }
 
-    result = socket.connect("192.168.43.61", 65431);
+    result = socket.connect("192.168.43.251", 65431);
     if (result != 0) {
         printf("Error! socket.connect() returned: %d\n", result);
         goto DISCONNECT;
@@ -60,10 +60,6 @@ int main() {
 
    char msg;
    char sbuffer[30];
-   //char readNum[30];
-   //char sendNum[30];
-   //bool isNumber; isNumber=0;
-   //bool isValid; isValid=1;
    bool concat; concat = false;
 
    while (true) {
