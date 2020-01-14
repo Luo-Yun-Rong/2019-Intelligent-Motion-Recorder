@@ -48,13 +48,10 @@ We have two modes in this project, day mode and night mode.
 1. STM32l476 nucleo + IKS01A2
 > There are lots of sensors in IKS01A2.  In this project, LSM6DSL accelerometer and LPS22HB pressure sensor are used.  IKS01A2 would collect data, and nucleo would do the calculation and analyze a user's status.
 
-
 2. STM32l475 disco
-
 > Use UART4 port to receive messages from nucleo, and decode them.  Afterwards, disco would send messages to PC server using socket.
 
 3. PC server
-
 > Upon receiving messages from disco, PC server would record the time and the message to a log file, and display the result on screen using SDL library.
    
 
