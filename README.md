@@ -1,28 +1,76 @@
 # Intelligent Motion Recorder
+![image](STM32Cube.JPG)
+===
 
-# Implementation
+**Author:**
+> Yi-Hui Chou B06901012,
+> Luo-Yun Rong B06901073
 
-溝通架構: STM32l476 nucleo + IKS01A2 → STM32 disco → PC server
+
+**Department:**
+> 3rd year, Electrical Engineering Department, National Taiwan University
+
+
+**Advisor:**
+> Professor Sheng-De Wang
+
+## Content
+- [Overview](#overview)
+- [Motivation](#motivation)
+- [Implementation](#implementation)
+    + [Function](#function)
+    + [Infrastructure](#infrastructure)
+- [Achievement](#achievement)
+- [How to reproduce](#how-to-reproduce)
+
+
+## Overview
+- A motion Recorder for day and night
+- Implement on STM32L475 and STM32L476+IKS01A2
+- Use wifi and uart to transmit data
+
+## Motivation
+Wearable devices are everywhere, so we want to create an  intelligent wearable to record a person's activity, including moving, sleeping, exercising, and so on, so as to manage his or her health.
+
+
+## Implementation
+### Function
+We have two modes in this project, day mode and night mode.
+- Day mode
+> Update motion detection, with 8 motions in total (stationary, standing, sitting, lying, walking,          fast walking, jogging, biking)
+- Night mode
+> If asleep, detect turnover. 
+
+> If not asleep, detect the user's activity, which is same with Day mode.
+
+### Infrastructure
+![image](Infrastruture.JPG)
 1. STM32l476 nucleo + IKS01A2
-   IKS01A2有各種sensor, 我們用到的是LSM6DSL加速度計跟LPS22HB壓力計。IKS01A2負責感測器數據採集，nucleo負責處理數據、計    算分類使用者狀態
+> There are lots of sensors in IKS01A2.  In this project, LSM6DSL accelerometer and LPS22HB pressure sensor are used.  IKS01A2 would collect data, and nucleo would do the calculation and analyze a user's status.
+
+
 2. STM32l475 disco
-   使用UART4的port接收nucleo的訊息，將訊息解碼
+
+> Use UART4 port to receive messages from nucleo, and decode them.  Afterwards, disco would send messages to PC server using socket.
+
 3. PC server
-   disco開發板用socket傳送完整字串給PC server。PC server 會記錄下收到訊息的時間以及訊息內容，儲存至一個log file, 並將    結果display到使用者介面的螢幕上(using SDL library)。
+
+> Upon receiving messages from disco, PC server would record the time and the message to a log file, and display the result on screen using SDL library.
    
-   
-# Algorithm flow
-1. Day mode
-   Update motion detection, with 8 motions in total (stationary, standing, sitting, lying, walking,          running, jogging, biking)      
-2. Night mode
-   If not sleeping, detect motion (same with day mode)
-   If the user is asleep, detect turn over
-   
- # How to reproduce
+
+## Achievement
+- Day mode
+> We successfully detect motions like stationary, walking, fast walking, jogging, sitting.  Moreover, it goes smoothly when pressing a button to switch mode. 
+
+- Night mode
+> We successfully detect motions when a user is not asleep and we also detect turn over immediately.  Moreover, when STM32 nucleo is stationary for more than 6 minutes, the status turns from no sleeping to lying and then to sleeping, which pretty makes sense.
+
+
+**[demo video link](https://drive.google.com/open?id=1mKJFM953Cb-rhk2k8j25r6vZ5kqS9A22)**
+
+
+## How to reproduce
  1. clone all the repo
  2. go to SDL official website to download SDL library
- 3. compile display.cpp (g++ display.cpp -lSDL2 -o display)
+ 3. compile display.cpp (g++ display.cpp -lSDL2 -o display | tee logfile)
  4. In terminal, execute ./display, and click start to start listening
-
-# demo video link
-https://drive.google.com/open?id=1mKJFM953Cb-rhk2k8j25r6vZ5kqS9A22
