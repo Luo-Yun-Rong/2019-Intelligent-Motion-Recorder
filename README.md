@@ -1,6 +1,6 @@
 # Intelligent Motion Recorder
 ![image](STM32Cube.JPG)
-===
+
 
 **Author:**
 > Yi-Hui Chou B06901012,
@@ -72,5 +72,5 @@ We have two modes in this project, day mode and night mode.
 ## How to reproduce
  1. clone all the repo
  2. go to SDL official website to download SDL library
- 3. compile display.cpp (g++ display.cpp -lSDL2 -o display | tee logfile)
+ 3. compile display.cpp `g++ display.cpp -lSDL2 -o display | tee logfile`
  4. In terminal, execute ./display, and click start to start listening
