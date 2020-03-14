@@ -35,18 +35,18 @@ Wearable devices are everywhere, so we want to create an  intelligent wearable t
 
 ## Implementation
 ### Function
-We have two modes in this project, day mode and night mode.
+We implemented two modes in this project, day mode and night mode.
 - Day mode
 > Update motion detection, with 8 motions in total (stationary, standing, sitting, lying, walking,          fast walking, jogging, biking)
 - Night mode
-> If asleep, detect turnover. 
+> If the user is asleep, detect his or her turnover during his or her sleep.
 
-> If not asleep, detect the user's activity, which is same with Day mode.
+> If the user is not asleep, detect the user's activity, which is same with Day mode.
 
 ### Infrastructure
 ![image](Infrastruture.JPG)
 1. STM32l476 nucleo + IKS01A2
-> There are lots of sensors in IKS01A2.  In this project, LSM6DSL accelerometer and LPS22HB pressure sensor are used.  IKS01A2 would collect data, and nucleo would do the calculation and analyze a user's status.
+> There are many sensors in IKS01A2.  In this project, LSM6DSL accelerometer and LPS22HB pressure sensor are used.  IKS01A2  collects data, and nucleo does the calculation and analyze a user's status.
 
 2. STM32l475 disco
 > Use UART4 port to receive messages from nucleo, and decode them.  Afterwards, disco would send messages to PC server using socket.
