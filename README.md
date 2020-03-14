@@ -39,7 +39,7 @@ We implemented two modes in this project, day mode and night mode.
 - Day mode
 > Update motion detection, with 8 motions in total (stationary, standing, sitting, lying, walking,          fast walking, jogging, biking)
 - Night mode
-> If the user is asleep, detect his or her turnover during his or her sleep.
+> If the user is asleep, detect his or her turnover during the sleep.
 
 > If the user is not asleep, detect the user's activity, which is same with Day mode.
 
